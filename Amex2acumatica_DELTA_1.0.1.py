@@ -2,7 +2,10 @@ import streamlit as st
 import pandas as pd
 import openpyxl
 import csv
-from io import StringIO
+from io import BytesIO,  StringIO
+import re
+import zipfile
+
 
 st.set_page_config(page_title="Amex → Acumatica Self-Service", layout="centered")
 
@@ -121,6 +124,44 @@ def process_statement(df):
 
 
 def split_by_employee(df, export_format):
+    """Split dataframe by employee last name column (auto-detected and regex-based) and zip outputs."""
+
+    # --- Detect the "Last Name" column dynamically ---
+    detected_col = None
+    for col in df.columns:
+        # Normalize and test
+        normalized = re.sub(r'\s+', ' ', col.strip().lower())
+        if re.search(r'supplemental.*cardmember.*last', normalized):
+            detected_col = col
+            break
+    if not detected_col:
+        for col in df.columns:
+            normalized = re.sub(r'\s+', ' ', col.strip().lower())
+            if re.search(r'cardmember.*last', normalized):
+                detected_col = col
+                break
+
+    if not detected_col:
+        st.error(
+            "❌ Could not detect a 'Supplemental Cardmember Last Name' column.\n"
+            "Please verify the file headers (row 14) include a similar field."
+        )
+        st.write("Available columns:", df.columns.tolist())
+        st.stop()
+
+    st.info(f"Detected employee last name column: **{detected_col}**")
+
+    # --- Generate per-employee claim files ---
+    memory_zip = BytesIO()
+    with zipfile.ZipFile(memory_zip, "w") as zf:
+        for last_name in df[detected_col].dropna().unique():
+            employee_data = df[df[detected_col] == last_name]
+            buf = StringIO()
+            employee_data.to_csv(buf, index=False)
+            zf.writestr(f"{last_name}_AMEX_Claim.csv", buf.getvalue())
+
+    memory_zip.seek(0)
+    return memory_zip
     """Split dataframe by detected employee last name column and zip outputs."""
     from io import BytesIO, StringIO
     import zipfile
