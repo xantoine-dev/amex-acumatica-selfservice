@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import openpyxl
 import csv
+import io
 from io import BytesIO,  StringIO
 import re
 import zipfile
