@@ -51,10 +51,7 @@ offline event.
 
 ## Enforcement
 
-Instances of abusive, harassing, or otherwise unacceptable behaviour may be reported to the
-project maintainers responsible for enforcement at [yxantoine.dev@proton.melto:xantoine.dev@proton.me).  All complaints will be
-reviewed and investigated promptly and fairly.
-
+Instances of abusive, harassing, or otherwise unacceptable behaviour may be reported to the project maintainers responsible for enforcement at [xantoine.dev@proton.me](mailto:xantoine.dev@proton.me). All complaints will be reviewed and investigated promptly and fairly.
 All project maintainers are obligated to respect the privacy and security of the reporter of
 any incident.
 
